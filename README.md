@@ -3,7 +3,7 @@
 一个面向中小型异步 API 服务的、模块化且易扩展的 FastAPI 项目模板。
 
 > [!IMPORTANT]
-> 项目目前处于早期开发阶段，目录结构和公共接口仍可能调整。README 中标记为“规划”的能力尚未全部实现，暂不建议直接用于生产环境。
+> Phase 1 最小可用架构已经完成，项目可以安装、启动和测试。数据库、缓存与认证仍在规划中，暂不建议直接用于生产环境。
 
 ## 项目介绍
 
@@ -39,105 +39,133 @@
 - **保持透明**：不过度封装 FastAPI、Pydantic 和 SQLAlchemy 的原生接口。
 - **易于测试和维护**：从项目早期建立测试、类型检查和代码质量约束。
 
-## 规划能力
+## 功能状态
 
-> 下列内容是项目建设目标，不代表当前版本已经全部实现。
+当前已经实现：
 
-- 应用工厂与生命周期管理；
-- 基于环境变量的统一配置管理与校验；
-- API 路由组织与版本管理；
+- 应用工厂与异步生命周期管理；
+- 基于环境变量和 `.env` 文件的配置管理与校验；
+- `/api/v1` 路由组织与模块化示例；
 - 统一异常体系和结构化错误响应；
-- 结构化日志、日志分级与请求追踪；
+- JSON 结构化日志、请求 ID 与访问日志；
+- 健康检查；
+- pytest、Ruff、mypy 和 GitHub Actions CI。
+
+后续规划：
+
 - SQLAlchemy 2.x 异步数据库访问；
 - Alembic 数据库迁移；
 - Redis 缓存访问接口；
 - JWT 身份认证与 RBAC 权限控制基础能力；
-- 健康检查与基础可观测性；
-- pytest、Ruff、类型检查和 CI；
+- 指标、链路追踪等可观测性能力；
 - Docker 容器化部署。
 
 ## 技术栈
 
 | 技术 | 用途 | 状态 |
 | --- | --- | --- |
-| Python | 核心开发语言 | 规划 |
-| FastAPI | Web API 框架 | 规划 |
-| Pydantic v2 | 数据校验与序列化 | 规划 |
-| Pydantic Settings | 配置管理 | 规划 |
+| Python 3.11+ | 核心开发语言 | 已集成 |
+| FastAPI | Web API 框架 | 已集成 |
+| Pydantic v2 | 数据校验与序列化 | 已集成 |
+| Pydantic Settings | 配置管理 | 已集成 |
 | SQLAlchemy 2.x | ORM 与异步数据库访问 | 规划 |
 | Alembic | 数据库迁移 | 规划 |
 | PostgreSQL / MySQL | 可选关系型数据库 | 规划 |
 | Redis | 可选缓存与数据存储 | 规划 |
 | PyJWT | JWT 身份认证 | 规划 |
-| Uvicorn | ASGI 服务运行 | 规划 |
-| pytest | 自动化测试 | 规划 |
-| Ruff | 代码检查与格式化 | 规划 |
+| Uvicorn | ASGI 服务运行 | 已集成 |
+| pytest / httpx2 | 自动化测试 | 已集成 |
+| Ruff / mypy | 格式化、代码检查与类型检查 | 已集成 |
 | Docker | 容器化部署 | 规划 |
 
-具体版本要求将在核心架构落地后写入 `pyproject.toml`。
+具体版本约束见 `pyproject.toml`，可复现依赖版本见 `uv.lock`。
 
 ## 目录结构
 
-项目计划采用“业务模块优先、基础设施分层”的组织方式：
+项目采用“业务模块优先、基础设施分层”的组织方式：
 
 ```text
 easy_fastapi/
 ├── app/
 │   ├── api/                    # API 路由入口与版本管理
-│   ├── core/                   # 配置、日志、异常和安全等核心能力
-│   ├── infrastructure/         # 数据库、缓存等基础设施实现
+│   ├── core/                   # 配置、日志、异常和生命周期
+│   ├── dependencies/           # 跨模块公共依赖
+│   ├── middleware/             # 请求上下文等中间件
 │   ├── modules/                # 按业务领域组织的功能模块
 │   │   └── example/
-│   │       ├── router.py       # 模块路由
-│   │       ├── schemas.py      # 请求与响应模型
-│   │       ├── service.py      # 业务逻辑
-│   │       ├── repository.py   # 数据访问逻辑
-│   │       └── models.py       # ORM 模型
-│   ├── dependencies/           # 跨模块公共依赖
+│   │       └── router.py       # 参考模块路由
+│   ├── schemas/                # 公共请求与响应模型
 │   └── main.py                 # 应用入口
 ├── tests/                      # 自动化测试
-├── scripts/                    # 开发与运维辅助脚本
+├── .github/workflows/ci.yml    # 持续集成
 ├── .env.example                # 环境变量示例
 ├── .gitignore
 ├── pyproject.toml              # 依赖和工具配置
-├── Dockerfile
-├── compose.yml
+├── uv.lock                     # 依赖锁文件
 └── README.md
 ```
 
-最终结构将以实现阶段的可维护性验证结果为准，不会为了分层而增加不必要的抽象。
+数据库、缓存等基础设施将在 Phase 2 加入，当前不会为了预留结构而创建空目录。
 
 ## 快速开始
 
-核心架构尚未完成，以下命令描述的是项目计划提供的最终使用体验，目前可能无法直接执行。
-
 ### 环境要求
 
-- Python 版本要求待确定；
+- Python 3.11 或更高版本；
 - 推荐使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境和依赖。
 
-### 目标用法
+### 安装与启动
 
 ```bash
 # 1. 克隆项目
 git clone https://github.com/glzhao-z/easy_fastapi.git
 cd easy_fastapi
 
-# 2. 安装基础依赖
+# 2. 根据锁文件安装运行与开发依赖
 uv sync
 
-# 3. 创建本地配置
+# 3. 创建本地配置（Windows PowerShell 使用 Copy-Item）
 cp .env.example .env
 
 # 4. 启动开发服务
 uv run uvicorn app.main:app --reload
 ```
 
-服务启动后，计划提供以下入口：
+服务启动后可访问：
 
 - API 文档：`http://127.0.0.1:8000/docs`
 - OpenAPI 文档：`http://127.0.0.1:8000/openapi.json`
 - 健康检查：`http://127.0.0.1:8000/health`
+- 示例接口：`http://127.0.0.1:8000/api/v1/examples/ping`
+
+### 配置
+
+所有环境变量使用 `EASY_FASTAPI_` 前缀，常用配置如下：
+
+| 环境变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `EASY_FASTAPI_APP_NAME` | `easy_fastapi` | 应用名称 |
+| `EASY_FASTAPI_ENVIRONMENT` | `development` | 运行环境 |
+| `EASY_FASTAPI_DEBUG` | `false` | 调试模式 |
+| `EASY_FASTAPI_HOST` | `127.0.0.1` | 服务监听地址 |
+| `EASY_FASTAPI_PORT` | `8000` | 服务端口 |
+| `EASY_FASTAPI_LOG_LEVEL` | `INFO` | 日志级别 |
+| `EASY_FASTAPI_DOCS_ENABLED` | `true` | 是否启用 API 文档 |
+| `EASY_FASTAPI_API_V1_PREFIX` | `/api/v1` | v1 API 前缀 |
+| `EASY_FASTAPI_REQUEST_ID_HEADER` | `X-Request-ID` | 请求追踪响应头 |
+
+完整示例见 `.env.example`。
+
+### 代码质量与测试
+
+```bash
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy app tests
+uv run pytest --cov=app --cov-report=term-missing --cov-fail-under=85
+```
+
+GitHub Actions 会在推送到 `main` 或创建 Pull Request 时对 Python 3.11 和 3.13 执行相同检查。
 
 ## 核心约定
 
@@ -151,7 +179,7 @@ uv run uvicorn app.main:app --reload
 
 ### 尊重 HTTP 与框架语义
 
-项目计划统一错误响应和异常处理，但不会强制包装所有成功响应。状态码、响应头、流式响应和 OpenAPI 描述将尽量保持 FastAPI 的原生行为。
+项目统一错误响应和异常处理，但不会强制包装成功响应。状态码、响应头、流式响应和 OpenAPI 描述保持 FastAPI 的原生行为。
 
 ### 显式优于隐式
 
@@ -161,15 +189,15 @@ uv run uvicorn app.main:app --reload
 
 ### Phase 1：最小可用架构
 
-- [ ] 初始化项目与依赖管理；
-- [ ] 确定模块化目录结构；
-- [ ] 实现应用工厂与生命周期管理；
-- [ ] 实现配置管理；
-- [ ] 建立 API 版本与路由组织方式；
-- [ ] 实现统一异常和错误响应；
-- [ ] 实现基础日志与请求追踪；
-- [ ] 建立 pytest、Ruff 和类型检查；
-- [ ] 建立基础 CI。
+- [x] 初始化项目与依赖管理；
+- [x] 确定模块化目录结构；
+- [x] 实现应用工厂与生命周期管理；
+- [x] 实现配置管理；
+- [x] 建立 API 版本与路由组织方式；
+- [x] 实现统一异常和错误响应；
+- [x] 实现基础日志与请求追踪；
+- [x] 建立 pytest、Ruff 和类型检查；
+- [x] 建立基础 CI。
 
 ### Phase 2：数据访问
 
@@ -207,17 +235,19 @@ uv run uvicorn app.main:app --reload
 
 ## 项目状态
 
-当前重点是完成 Phase 1，并验证以下三个核心承诺：
+Phase 1 已完成并验证：
 
 1. 最小配置可以启动；
-2. 可选组件可以真正独立启用；
-3. 新增业务模块不需要修改大量公共代码。
+2. 未安装数据库和 Redis 也可以运行；
+3. 业务路由可以按模块接入 `/api/v1`；
+4. 错误响应、请求追踪和结构化日志具有统一契约；
+5. 格式化、静态检查、类型检查和自动化测试可重复执行。
 
-在首个可用版本发布前，项目结构和接口可能发生不兼容调整。
+下一阶段将进入 SQLAlchemy、Alembic 和 Redis 数据访问能力建设。在首个稳定版本发布前，项目结构和接口仍可能发生不兼容调整。
 
 ## 参与贡献
 
-欢迎通过 Issue 提交建议、使用场景和问题反馈。项目进入可运行阶段后，将补充本地开发流程、测试要求和 Pull Request 规范。
+欢迎通过 Issue 提交建议、使用场景和问题反馈。提交 Pull Request 前，请确保 Ruff、mypy 和 pytest 检查全部通过。
 
 提交功能建议时，建议同时说明：
 
