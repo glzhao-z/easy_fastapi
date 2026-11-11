@@ -1,4 +1,4 @@
-"""Shared test application fixtures."""
+"""测试应用共享夹具。"""
 
 from collections.abc import AsyncIterator
 
@@ -27,14 +27,14 @@ def app(settings: Settings) -> FastAPI:
 
 @pytest.fixture
 def anyio_backend() -> str:
-    """Keep the test matrix focused on the asyncio backend used in production."""
+    """测试仅使用生产环境采用的 asyncio 后端。"""
     return "asyncio"
 
 
 @pytest.fixture
 async def client(app: FastAPI) -> AsyncIterator[AsyncClient]:
     transport = ASGITransport(app=app, raise_app_exceptions=False)
-    # ASGITransport intentionally leaves lifespan ownership to the caller.
+    # ASGITransport 不负责管理生命周期，因此由测试夹具显式进入生命周期上下文。
     async with (
         app.router.lifespan_context(app),
         AsyncClient(transport=transport, base_url="http://testserver") as test_client,

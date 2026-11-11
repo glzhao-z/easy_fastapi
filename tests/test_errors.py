@@ -1,4 +1,4 @@
-"""Error contract tests."""
+"""错误响应契约测试。"""
 
 import pytest
 from fastapi import FastAPI

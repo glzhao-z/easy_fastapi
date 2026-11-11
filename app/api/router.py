@@ -1,4 +1,4 @@
-"""Top-level router composition."""
+"""顶层路由组装。"""
 
 from fastapi import APIRouter
 

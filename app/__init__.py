@@ -1,1 +1,1 @@
-"""easy_fastapi application package."""
+"""easy_fastapi 应用包。"""

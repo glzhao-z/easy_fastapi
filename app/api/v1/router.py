@@ -1,4 +1,4 @@
-"""Version 1 router composition."""
+"""第一版 API 路由组装。"""
 
 from fastapi import APIRouter
 

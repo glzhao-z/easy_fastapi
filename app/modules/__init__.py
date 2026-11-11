@@ -1,1 +1,1 @@
-"""Business modules package."""
+"""业务模块包。"""

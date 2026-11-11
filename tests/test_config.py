@@ -1,4 +1,4 @@
-"""Configuration loading tests."""
+"""配置加载测试。"""
 
 import pytest
 from pydantic import ValidationError

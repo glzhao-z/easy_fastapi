@@ -1,4 +1,4 @@
-"""Structured application logging with request correlation."""
+"""支持请求关联的结构化应用日志。"""
 
 import json
 import logging
@@ -16,7 +16,7 @@ _STANDARD_LOG_RECORD_FIELDS = set(logging.makeLogRecord({}).__dict__) | {
 
 
 class JsonFormatter(logging.Formatter):
-    """Emit one JSON object per line so logs remain machine-readable."""
+    """每行输出一个 JSON 对象，便于日志系统解析。"""
 
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
@@ -35,11 +35,11 @@ class JsonFormatter(logging.Formatter):
 
 
 class _EasyFastAPIStreamHandler(logging.StreamHandler[Any]):
-    """Marker type used to keep logging configuration idempotent."""
+    """用于保证日志配置幂等的标记类型。"""
 
 
 def configure_logging(level: str) -> None:
-    """Configure a single idempotent handler for the root logger."""
+    """为根日志记录器配置唯一且可重复调用的处理器。"""
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
 

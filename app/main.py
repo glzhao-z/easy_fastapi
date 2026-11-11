@@ -1,4 +1,4 @@
-"""ASGI application entry point."""
+"""ASGI 应用入口。"""
 
 from fastapi import FastAPI
 
@@ -11,7 +11,7 @@ from app.middleware.request_context import RequestContextMiddleware
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
-    """Create an isolated application instance for production and tests."""
+    """创建可独立配置的应用实例，供生产环境和测试使用。"""
     resolved_settings = settings or get_settings()
     configure_logging(resolved_settings.log_level)
 
@@ -24,7 +24,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url="/openapi.json" if resolved_settings.docs_enabled else None,
         lifespan=lifespan,
     )
-    # Settings live on app.state so every application instance can be configured independently.
+    # 将配置保存到 app.state，确保每个应用实例都能独立配置。
     app.state.settings = resolved_settings
 
     register_exception_handlers(app)

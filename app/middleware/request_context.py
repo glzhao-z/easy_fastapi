@@ -1,4 +1,4 @@
-"""Request correlation and access logging middleware."""
+"""请求关联与访问日志中间件。"""
 
 import logging
 import re
@@ -15,7 +15,7 @@ _SAFE_REQUEST_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 
 
 class RequestContextMiddleware:
-    """Attach a safe request ID and emit one access log for every HTTP request."""
+    """为每个 HTTP 请求附加安全的请求 ID，并记录一条访问日志。"""
 
     def __init__(self, app: ASGIApp, request_id_header: str = "X-Request-ID") -> None:
         self.app = app
@@ -41,7 +41,7 @@ class RequestContextMiddleware:
             nonlocal status_code
             if message["type"] == "http.response.start":
                 status_code = message["status"]
-                # Replace a handler-provided value instead of emitting duplicate headers.
+                # 覆盖异常处理器设置的同名值，避免生成重复响应头。
                 MutableHeaders(scope=message)[self.request_id_header] = request_id
             await send(message)
 

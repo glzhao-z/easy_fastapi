@@ -1,1 +1,1 @@
-"""Routes that are intentionally not tied to an API version."""
+"""不与特定 API 版本绑定的路由。"""

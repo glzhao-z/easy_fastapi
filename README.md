@@ -3,7 +3,7 @@
 一个面向中小型异步 API 服务的、模块化且易扩展的 FastAPI 项目模板。
 
 > [!IMPORTANT]
-> Phase 1 最小可用架构已经完成，项目可以安装、启动和测试。数据库、缓存与认证仍在规划中，暂不建议直接用于生产环境。
+> Phase 1、Phase 2 已完成。PostgreSQL、MySQL 和 Redis 已通过真实服务集成测试，认证仍在规划中。
 
 ## 项目介绍
 
@@ -50,12 +50,11 @@
 - JSON 结构化日志、请求 ID 与访问日志；
 - 健康检查；
 - pytest、Ruff、mypy 和 GitHub Actions CI。
+- 可选 SQLAlchemy 异步会话、PostgreSQL/MySQL 驱动、Alembic 迁移和 Redis 缓存；
+- 外部依赖就绪检查与连接生命周期管理。
 
 后续规划：
 
-- SQLAlchemy 2.x 异步数据库访问；
-- Alembic 数据库迁移；
-- Redis 缓存访问接口；
 - JWT 身份认证与 RBAC 权限控制基础能力；
 - 指标、链路追踪等可观测性能力；
 - Docker 容器化部署。
@@ -68,10 +67,10 @@
 | FastAPI | Web API 框架 | 已集成 |
 | Pydantic v2 | 数据校验与序列化 | 已集成 |
 | Pydantic Settings | 配置管理 | 已集成 |
-| SQLAlchemy 2.x | ORM 与异步数据库访问 | 规划 |
-| Alembic | 数据库迁移 | 规划 |
-| PostgreSQL / MySQL | 可选关系型数据库 | 规划 |
-| Redis | 可选缓存与数据存储 | 规划 |
+| SQLAlchemy 2.0 | ORM 与异步数据库访问 | 已集成（可选） |
+| Alembic | 数据库迁移 | 已集成（可选） |
+| PostgreSQL / MySQL | 可选关系型数据库 | 已集成并通过真实服务测试 |
+| Redis | 可选缓存与数据存储 | 已集成并通过真实服务测试 |
 | PyJWT | JWT 身份认证 | 规划 |
 | Uvicorn | ASGI 服务运行 | 已集成 |
 | pytest / httpx2 | 自动化测试 | 已集成 |
@@ -105,7 +104,7 @@ easy_fastapi/
 └── README.md
 ```
 
-数据库、缓存等基础设施将在 Phase 2 加入，当前不会为了预留结构而创建空目录。
+数据库与缓存实现位于 `app/infrastructure/`，请求依赖位于 `app/dependencies/services.py`，迁移位于 `migrations/`。
 
 ## 快速开始
 
@@ -159,10 +158,11 @@ uv run uvicorn app.main:app --reload
 ### 代码质量与测试
 
 ```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy app tests
-uv run pytest --cov=app --cov-report=term-missing --cov-fail-under=85
+uv sync --all-extras
+uv run --all-extras ruff format --check .
+uv run --all-extras ruff check .
+uv run --all-extras mypy app tests migrations
+uv run --all-extras pytest --cov=app --cov-report=term-missing --cov-fail-under=85
 ```
 
 GitHub Actions 会在推送到 `main` 或创建 Pull Request 时对 Python 3.11 和 3.13 执行相同检查。
@@ -201,12 +201,15 @@ GitHub Actions 会在推送到 `main` 或创建 Pull Request 时对 Python 3.11 
 
 ### Phase 2：数据访问
 
-- [ ] 集成 SQLAlchemy 异步会话；
-- [ ] 支持 PostgreSQL；
-- [ ] 评估并支持 MySQL；
-- [ ] 集成 Alembic 数据库迁移；
-- [ ] 集成 Redis；
-- [ ] 提供健康检查和连接生命周期管理。
+- [x] 集成 SQLAlchemy 异步会话；
+- [x] 接入 PostgreSQL 异步驱动；
+- [x] 接入 MySQL 异步驱动；
+- [x] 集成 Alembic 数据库迁移；
+- [x] 集成 Redis；
+- [x] 提供健康检查和连接生命周期管理。
+- [x] 完成真实 PostgreSQL/MySQL/Redis 服务验收（已配置 CI）。
+
+安装、配置、事务约定与迁移命令见 [Phase 2 使用说明](docs/phase2.md)。
 
 ### Phase 3：安全认证
 
@@ -243,7 +246,7 @@ Phase 1 已完成并验证：
 4. 错误响应、请求追踪和结构化日志具有统一契约；
 5. 格式化、静态检查、类型检查和自动化测试可重复执行。
 
-下一阶段将进入 SQLAlchemy、Alembic 和 Redis 数据访问能力建设。在首个稳定版本发布前，项目结构和接口仍可能发生不兼容调整。
+Phase 2 已实现可选数据库和缓存连接、请求会话、迁移及就绪检查，并通过真实服务验收。下一阶段为认证能力。
 
 ## 参与贡献
 

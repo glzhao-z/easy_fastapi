@@ -10,8 +10,14 @@ dependencies = [
     "uvicorn[standard]>=0.34,<1.0",
 ]
 
+[project.optional-dependencies]
+postgres = ["sqlalchemy[asyncio]>=2.0,<2.1", "alembic>=1.14,<2", "asyncpg>=0.30,<1"]
+mysql = ["sqlalchemy[asyncio]>=2.0,<2.1", "alembic>=1.14,<2", "asyncmy>=0.2.10,<1", "cryptography>=44"]
+redis = ["redis>=5.2,<9"]
+
 [dependency-groups]
 dev = [
+    "aiosqlite>=0.20,<1",
     "httpx2>=2.13,<3.0",
     "mypy>=1.14,<2.0",
     "pytest>=8.3,<10.0",
@@ -26,6 +32,7 @@ package = false
 addopts = "-ra --strict-config --strict-markers"
 pythonpath = ["."]
 testpaths = ["tests"]
+markers = ["integration: 需要真实数据库和 Redis 服务"]
 
 [tool.coverage.run]
 branch = true
@@ -43,6 +50,7 @@ line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
+allowed-confusables = ["，", "；"]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]

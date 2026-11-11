@@ -1,4 +1,4 @@
-"""Reference API module; replace it with real domain modules as the project grows."""
+"""API 参考模块；项目扩展后可替换为实际的领域模块。"""
 
 from fastapi import APIRouter
 

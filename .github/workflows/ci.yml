@@ -12,6 +12,8 @@ jobs:
   quality:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,7 +33,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --locked --all-groups --python ${{ matrix.python-version }}
+        run: uv sync --locked --all-groups --all-extras --python ${{ matrix.python-version }}
 
       - name: Check formatting
         run: uv run --locked ruff format --check .
@@ -40,7 +42,21 @@ jobs:
         run: uv run --locked ruff check .
 
       - name: Type check
-        run: uv run --locked mypy app tests
+        run: uv run --locked --all-extras mypy app tests migrations
 
       - name: Test
-        run: uv run --locked pytest --cov=app --cov-report=term-missing --cov-fail-under=85
+        run: uv run --locked --all-extras pytest --cov=app --cov-report=term-missing --cov-fail-under=85
+
+      - name: Start integration services
+        run: docker compose -p easy-fastapi-ci -f compose.test.yml up -d --wait
+
+      - name: Test real services and migrations
+        env:
+          TEST_POSTGRES_URL: postgresql+asyncpg://postgres:postgres@127.0.0.1:15432/easy_fastapi
+          TEST_MYSQL_URL: mysql+asyncmy://root:mysql@127.0.0.1:13306/easy_fastapi
+          TEST_REDIS_URL: redis://127.0.0.1:16379/0
+        run: uv run --locked --all-extras pytest tests/test_infrastructure.py tests/test_migrations.py
+
+      - name: Stop integration services
+        if: always()
+        run: docker compose -p easy-fastapi-ci -f compose.test.yml down -v

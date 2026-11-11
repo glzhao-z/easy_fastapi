@@ -1,1 +1,1 @@
-"""Core application services shared by all business modules."""
+"""供所有业务模块共享的应用核心能力。"""

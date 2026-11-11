@@ -1,1 +1,1 @@
-"""Application middleware package."""
+"""应用中间件包。"""

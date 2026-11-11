@@ -1,4 +1,4 @@
-"""Schemas for the reference business module."""
+"""示例业务模块的数据模型。"""
 
 from pydantic import BaseModel
 

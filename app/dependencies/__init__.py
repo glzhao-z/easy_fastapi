@@ -1,1 +1,1 @@
-"""Reusable FastAPI dependencies."""
+"""可复用的 FastAPI 依赖项。"""

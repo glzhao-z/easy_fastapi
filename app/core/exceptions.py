@@ -1,4 +1,4 @@
-"""Application exceptions and standardized error responses."""
+"""应用异常与标准化错误响应。"""
 
 import logging
 from collections.abc import Mapping
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class AppException(Exception):
-    """Expected application error that is safe to expose to API consumers."""
+    """可以安全返回给 API 调用方的预期应用异常。"""
 
     def __init__(
         self,
@@ -94,7 +94,7 @@ async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ) -> JSONResponse:
-    # Do not echo invalid input values; error locations and messages are enough for clients.
+    # 不回显无效输入值，仅向客户端返回错误位置与说明，避免泄露敏感数据。
     details = [
         ErrorDetail(
             location=[str(part) for part in error["loc"]],
@@ -123,7 +123,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    """Install handlers without coupling business modules to HTTP response details."""
+    """注册异常处理器，避免业务模块与 HTTP 响应细节耦合。"""
 
     @app.exception_handler(AppException)
     async def handle_app_exception(request: Request, exc: Exception) -> JSONResponse:

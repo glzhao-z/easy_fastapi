@@ -1,1 +1,1 @@
-"""Small reference module showing the intended module layout."""
+"""用于展示推荐目录结构的精简示例模块。"""

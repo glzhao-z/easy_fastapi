@@ -1,1 +1,1 @@
-"""Shared request and response schemas."""
+"""共享的请求与响应数据模型。"""

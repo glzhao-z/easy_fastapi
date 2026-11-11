@@ -1,4 +1,4 @@
-"""Schemas used by the standardized error handlers."""
+"""标准化异常处理器使用的数据模型。"""
 
 from typing import Any
 

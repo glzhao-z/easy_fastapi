@@ -1,4 +1,4 @@
-"""System endpoint schemas."""
+"""系统接口数据模型。"""
 
 from pydantic import BaseModel
 
